@@ -1,4 +1,5 @@
 ﻿using Azure.Storage.Queues;
+using Azure.Storage.Queues.Models;
 
 using System;
 
@@ -12,14 +13,15 @@ namespace Queue_In_Azure_Demo
         {
             QueueClient qClient = new QueueClient(StorageAccountConnectionString, qName);
 
-            string messageToQueue = String.Empty;
             if(qClient.Exists())
             {
-                for (int i = 0; i <= 6; i++)
+                PeekedMessage[] peekMessage = qClient.PeekMessages(3);
+                foreach(PeekedMessage peekedMessage in peekMessage) 
                 {
-                    messageToQueue = $"This is Message number {i+1}";
-                    qClient.SendMessage(messageToQueue);
+                    Console.WriteLine($"Message ID: {peekedMessage.MessageId}\nMessage Body:{peekedMessage.Body}\n" +
+                        $"Time when Message will expires {peekedMessage.ExpiresOn}");
                 }
+                
             }
             Console.WriteLine("Message succesfully sent!");
             Console.ReadLine();
